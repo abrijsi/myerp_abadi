@@ -28,6 +28,7 @@ data-textdirection="{{ env('MIX_CONTENT_DIRECTION') === 'rtl' ? 'rtl' : 'ltr' }}
 
   {{-- Include core + vendor Styles --}}
   @include('panels/styles')
+  <link rel="stylesheet" href="{{ asset('css/overrides.css') }}">
 </head>
 
 
