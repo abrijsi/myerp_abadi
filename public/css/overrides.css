@@ -1,0 +1,9 @@
+.dark-layout .form-control[type=file]::file-selector-button {
+  background-color: #283046;
+}
+.menu-title,
+.menu-item {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
