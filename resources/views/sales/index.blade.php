@@ -135,7 +135,7 @@
 'use strict';
 
 // Injeksi data langsung dari controller
-const salesData = @json($sales);
+
 
 // Normalize tanggal (untuk filter range)
 function normalizeDate(dateString) {
@@ -183,97 +183,78 @@ $(function () {
     }
   });
 
-  // DataTable init
-  const table = $('.dt-advanced-search').DataTable({
-    data: salesData,
-    columns: [
-     {
-  data: 'transdate',
-  title: 'Tanggal',
-  render: function (data, type, row) {
-    if (type === 'display' || type === 'filter') {
-      const date = new Date(data);
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day}-${month}-${year}`; // Untuk tampilan
-    }
-    return data; // Untuk sorting & export
-  }
-},
-      { data: 'nofaktur', title: 'No Faktur' },
-      {
-  data: 'totalsales',
-  title: 'Jumlah Faktur',
-  className: 'text-end',
-  render: function (data, type, row) {
-    if (!data) return 'Rp. 0,00';
-    return 'Rp. ' + new Intl.NumberFormat('id-ID').format(data) + ',00';
-  }
-},
-{
-  data: 'total',
-  title: 'Jumlah Pembayaran',
-  className: 'text-end',
-  render: function (data, type, row) {
-    if (!data) return 'Rp. 0,00';
-    return 'Rp. ' + new Intl.NumberFormat('id-ID').format(data) + ',00';
-  }
-},
-  
-      {
-        data: 'status',
-        title: 'Paid?',
-        render: data => data == 1 ? 'Ya' : 'Tidak'
-      },
-      {
-        data: 'overdue',
-        title: 'Telat?',
-        render: data => data == 1 ? 'Ya' : 'Tidak'
-      },
-	  { data: 'firstname', title: 'Kode Pelanggan' },
-	  { data: 'custcode', title: 'Nama Pelanggan' },
-      {
-        data: null,
-        title: 'Action',
-        orderable: false,
-        searchable: false,
-        render: function (data, type, row) {
-          return `
-            <div class="d-inline-flex">
-              <a class="pe-1 dropdown-toggle hide-arrow text-primary" data-bs-toggle="dropdown">
-                ${feather.icons['more-vertical'].toSvg({ class: 'font-small-4' })}
-              </a>
-              <div class="dropdown-menu dropdown-menu-end">
-                <a href="/sales/${row.id}" class="dropdown-item">
-                  ${feather.icons['file-text'].toSvg({ class: 'font-small-4 me-50' })}Detail</a>
-                <a href="javascript:;" class="dropdown-item">
-                  ${feather.icons['archive'].toSvg({ class: 'font-small-4 me-50' })}Archive</a>
-                <a href="javascript:;" class="dropdown-item delete-record">
-                  ${feather.icons['trash-2'].toSvg({ class: 'font-small-4 me-50' })}Delete</a>
-              </div>
-            </div>
-            <a href="/sales/${row.id}/edit" class="item-edit">
-              ${feather.icons['edit'].toSvg({ class: 'font-small-4' })}
-            </a>`;
+ //--
+ //--
+const table = $('.dt-advanced-search').DataTable({
+  processing: true,
+  serverSide: true,
+  searching: false, 
+  ajax: '{{ route("sales.tabel") }}', // ini akan ambil JSON dari controller getData()
+  columns: [
+    {
+      data: 'transdate',
+      title: 'Tanggal',
+      render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+          const date = new Date(data);
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const year = date.getFullYear();
+          return `${day}-${month}-${year}`;
         }
+        return data;
       }
-    ],
-    dom: '<"d-flex justify-content-between align-items-center mx-0 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-         't<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-    responsive: true,
-    language: {
-      paginate: {
-        previous: '&nbsp;',
-        next: '&nbsp;'
+    },
+    { data: 'nofaktur', title: 'No Faktur' },
+    {
+      data: 'totalsales',
+      title: 'Jumlah Faktur',
+      className: 'text-end',
+      render: data => `Rp. ${new Intl.NumberFormat('id-ID').format(data)}`
+    },
+    {
+      data: 'total',
+      title: 'Jumlah Pembayaran',
+      className: 'text-end',
+      render: data => `Rp. ${new Intl.NumberFormat('id-ID').format(data)}`
+    },
+    {
+      data: 'status',
+      title: 'Paid?',
+      render: data => data == 1 ? 'Ya' : 'Tidak'
+    },
+    {
+      data: 'overdue',
+      title: 'Telat?',
+      render: data => data == 1 ? 'Ya' : 'Tidak'
+    },
+    { data: 'firstname', title: 'Kode Pelanggan' },
+    { data: 'custcode', title: 'Nama Pelanggan' },
+    {
+      data: null,
+      orderable: false,
+      searchable: false,
+      render: function (data, type, row) {
+        return `
+          <a href="/sales/${row.id}/edit" class="btn btn-sm btn-primary">Edit</a>
+        `;
       }
     }
-  });
+  ]
+});
 
-  // Event filter kolom
-  $('input.dt-input').on('keyup', function () {
-    filterColumn($(this).attr('data-column'), $(this).val());
-  });
+$('#search-box').on('keyup', function () {
+  table.search(this.value).draw();
+});
+
+$('input.dt-input').on('keyup change', function () {
+  table
+    .column($(this).data('column'))
+    .search(this.value)
+    .draw();
+});
+
+//
 
   // Styling: Hilangkan size kecil
   $('.dataTables_filter .form-control').removeClass('form-control-sm');

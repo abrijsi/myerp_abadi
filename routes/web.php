@@ -221,5 +221,8 @@ Route::get('/maps/leaflet', [ChartsController::class, 'maps_leaflet'])->name('ma
 // locale Route
 Route::get('lang/{locale}', [LanguageController::class, 'swap']);
 
-Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
-Route::get('/sales/tabel', [SaleController::class, 'getDatatables'])->name('sales.tabel'); // <-- penting
+// routes/web.php
+
+
+Route::get('/sales', [SaleController::class, 'index'])->name('sales.index'); // Tampilkan view
+Route::get('/sales/tabel', [SaleController::class, 'getDatatables'])->name('sales.tabel'); // DataTables AJAX server-side
