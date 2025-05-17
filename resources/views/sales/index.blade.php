@@ -29,91 +29,43 @@
   <div class="row">
     <div class="col-12">
       <div class="card">
-        <div class="card-header border-bottom">
-          <h4 class="card-title">Filter Data</h4>
-        </div>
+        <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+		  <h4 class="card-title">Filter Data</h4>
+		  <a href="" class="btn btn-primary">
+			<i data-feather="plus"></i> Buat Faktur
+		  </a>
+		</div>
+		
 		<div class="card-body mt-2">
           <form class="dt_adv_search" method="POST">
             <div class="row g-1 mb-md-1">
               <div class="col-md-4">
-                <label class="form-label">Name:</label>
-                <input
-                  type="text"
-                  class="form-control dt-input dt-full-name"
-                  data-column="1"
-                  placeholder="Alaric Beslier"
-                  data-column-index="0"
-                />
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Email:</label>
-                <input
-                  type="text"
-                  class="form-control dt-input"
-                  data-column="2"
-                  placeholder="demo@example.com"
-                  data-column-index="1"
-                />
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Post:</label>
-                <input
-                  type="text"
-                  class="form-control dt-input"
-                  data-column="3"
-                  placeholder="Web designer"
-                  data-column-index="2"
-                />
-              </div>
-            </div>
-            <div class="row g-1">
-              <div class="col-md-4">
-                <label class="form-label">City:</label>
-                <input
-                  type="text"
-                  class="form-control dt-input"
-                  data-column="4"
-                  placeholder="Balky"
-                  data-column-index="3"
-                />
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Date:</label>
-                <div class="mb-0">
-                  <input
-                    type="text"
-                    class="form-control dt-date flatpickr-range dt-input"
-                    data-column="5"
-                    placeholder="StartDate to EndDate"
-                    data-column-index="4"
-                    name="dt_date"
-                  />
-                  <input
-                    type="hidden"
-                    class="form-control dt-date start_date dt-input"
-                    data-column="5"
-                    data-column-index="4"
-                    name="value_from_start_date"
-                  />
-                  <input
-                    type="hidden"
-                    class="form-control dt-date end_date dt-input"
-                    name="value_from_end_date"
-                    data-column="5"
-                    data-column-index="4"
-                  />
-                </div>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Salary:</label>
-                <input
-                  type="text"
-                  class="form-control dt-input"
-                  data-column="6"
-                  placeholder="10000"
-                  data-column-index="5"
-                />
-              </div>
+				  <label class="form-label">No Faktur:</label>
+				  <input
+					type="text"
+					class="form-control dt-input"
+					data-column="1"
+					placeholder="Cari No Faktur"
+				  />
+				</div>
+				<div class="col-md-4">
+				  <label class="form-label">Kode Pelanggan:</label>
+				  <input
+					type="text"
+					class="form-control dt-input"
+					data-column="6"
+					placeholder="Cari Kode Pelanggan"
+				  />
+				</div>
+				<div class="col-md-4">
+				  <label class="form-label">Nama Pelanggan:</label>
+				  <input
+					type="text"
+					class="form-control dt-input"
+					data-column="7"
+					placeholder="Cari Nama Pelanggan"
+				  />
+				</div>
             </div>
           </form>
         </div>
@@ -122,26 +74,29 @@
           <table class="dt-advanced-search table">
             <thead>
               <tr>
-                <th></th>
+               
                 <th>Tanggal</th>
                 <th>No Faktur</th>
                 <th>Jumlah Faktur</th>
                 <th>Jumlah Pembayaran</th>
                 <th>Paid ?</th>
                 <th>Telat ?</th>
+				<th>Kode Pelanggan</th>
+				<th>Nama Pelanggan</th>
 				<th>Action</th>
               </tr>
             </thead>
 
             <tfoot>
-              <tr>
-                <th></th>
+              <tr>          
                 <th>Tanggal</th>
                 <th>No Faktur</th>
                 <th>Jumlah Faktur</th>
                 <th>Jumlah Pembayaran</th>
                 <th>Paid ?</th>
                 <th>Telat ?</th>
+				<th>Kode Pelanggan</th>
+				<th>Nama Pelanggan</th>
 				<th>Action</th>
               </tr>
             </tfoot>
@@ -172,9 +127,157 @@
   <script src="{{ asset(mix('vendors/js/tables/datatable/dataTables.rowGroup.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/pickers/flatpickr/flatpickr.min.js')) }}"></script>
 @endsection
+
+
+
 @section('page-script')
-  {{-- Page js files --}}
+<script>
+'use strict';
+
+// Injeksi data langsung dari controller
+const salesData = @json($sales);
+
+// Normalize tanggal (untuk filter range)
+function normalizeDate(dateString) {
+  const date = new Date(dateString);
+  return date.getFullYear() + '' + ('0' + (date.getMonth() + 1)).slice(-2) + '' + ('0' + date.getDate()).slice(-2);
+}
+
+// Filter berdasarkan range tanggal
+function filterByDate(column, startDate, endDate) {
+  $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+    const rowDate = normalizeDate(data[column]);
+    const start = normalizeDate(startDate);
+    const end = normalizeDate(endDate);
+    return (start <= rowDate && rowDate <= end);
+  });
+}
+
+// Event filter kolom
+function filterColumn(i, val) {
+  if (i === 5) {
+    const startDate = $('.start_date').val();
+    const endDate = $('.end_date').val();
+    if (startDate !== '' && endDate !== '') {
+      filterByDate(i, startDate, endDate);
+    }
+    $('.dt-advanced-search').DataTable().draw();
+  } else {
+    $('.dt-advanced-search').DataTable().column(i).search(val, false, true).draw();
+  }
+}
+
+$(function () {
+  // Inisialisasi DateRangePicker
+  $('.flatpickr-range').flatpickr({
+    mode: 'range',
+    dateFormat: 'm/d/Y',
+    onClose: function (selectedDates) {
+      if (selectedDates.length === 2) {
+        const start = selectedDates[0];
+        const end = selectedDates[1];
+        $('.start_date').val(`${start.getMonth() + 1}/${start.getDate()}/${start.getFullYear()}`);
+        $('.end_date').val(`${end.getMonth() + 1}/${end.getDate()}/${end.getFullYear()}`);
+        $(this).trigger('change').trigger('keyup');
+      }
+    }
+  });
+
+  // DataTable init
+  const table = $('.dt-advanced-search').DataTable({
+    data: salesData,
+    columns: [
+     {
+  data: 'transdate',
+  title: 'Tanggal',
+  render: function (data, type, row) {
+    if (type === 'display' || type === 'filter') {
+      const date = new Date(data);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`; // Untuk tampilan
+    }
+    return data; // Untuk sorting & export
+  }
+},
+      { data: 'nofaktur', title: 'No Faktur' },
+      {
+  data: 'totalsales',
+  title: 'Jumlah Faktur',
+  className: 'text-end',
+  render: function (data, type, row) {
+    if (!data) return 'Rp. 0,00';
+    return 'Rp. ' + new Intl.NumberFormat('id-ID').format(data) + ',00';
+  }
+},
+{
+  data: 'total',
+  title: 'Jumlah Pembayaran',
+  className: 'text-end',
+  render: function (data, type, row) {
+    if (!data) return 'Rp. 0,00';
+    return 'Rp. ' + new Intl.NumberFormat('id-ID').format(data) + ',00';
+  }
+},
   
-  <script src="{{ asset(mix('js/scripts/tables/table-datatables-advanced.js')) }}"></script>
-  
+      {
+        data: 'status',
+        title: 'Paid?',
+        render: data => data == 1 ? 'Ya' : 'Tidak'
+      },
+      {
+        data: 'overdue',
+        title: 'Telat?',
+        render: data => data == 1 ? 'Ya' : 'Tidak'
+      },
+	  { data: 'firstname', title: 'Kode Pelanggan' },
+	  { data: 'custcode', title: 'Nama Pelanggan' },
+      {
+        data: null,
+        title: 'Action',
+        orderable: false,
+        searchable: false,
+        render: function (data, type, row) {
+          return `
+            <div class="d-inline-flex">
+              <a class="pe-1 dropdown-toggle hide-arrow text-primary" data-bs-toggle="dropdown">
+                ${feather.icons['more-vertical'].toSvg({ class: 'font-small-4' })}
+              </a>
+              <div class="dropdown-menu dropdown-menu-end">
+                <a href="/sales/${row.id}" class="dropdown-item">
+                  ${feather.icons['file-text'].toSvg({ class: 'font-small-4 me-50' })}Detail</a>
+                <a href="javascript:;" class="dropdown-item">
+                  ${feather.icons['archive'].toSvg({ class: 'font-small-4 me-50' })}Archive</a>
+                <a href="javascript:;" class="dropdown-item delete-record">
+                  ${feather.icons['trash-2'].toSvg({ class: 'font-small-4 me-50' })}Delete</a>
+              </div>
+            </div>
+            <a href="/sales/${row.id}/edit" class="item-edit">
+              ${feather.icons['edit'].toSvg({ class: 'font-small-4' })}
+            </a>`;
+        }
+      }
+    ],
+    dom: '<"d-flex justify-content-between align-items-center mx-0 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+         't<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+    responsive: true,
+    language: {
+      paginate: {
+        previous: '&nbsp;',
+        next: '&nbsp;'
+      }
+    }
+  });
+
+  // Event filter kolom
+  $('input.dt-input').on('keyup', function () {
+    filterColumn($(this).attr('data-column'), $(this).val());
+  });
+
+  // Styling: Hilangkan size kecil
+  $('.dataTables_filter .form-control').removeClass('form-control-sm');
+  $('.dataTables_length .form-select').removeClass('form-select-sm').removeClass('form-control-sm');
+});
+</script>
 @endsection

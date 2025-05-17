@@ -13,7 +13,7 @@ class SaleController extends Controller
 
     // Berikan data untuk DataTables
     public function getDatatables()
-    {
+    {   
         $sales = DB::table('salesinfo')
             ->join('customers', 'salesinfo.customerid', '=', 'customers.id')
             ->join('employee', 'salesinfo.employeeid', '=', 'employee.id')
@@ -39,6 +39,6 @@ class SaleController extends Controller
             )
             ->get();
 
-        return response()->json(['data' => $sales]); // <--- hanya di sini
+        return view('sales.index', compact('sales'));
     }
 }

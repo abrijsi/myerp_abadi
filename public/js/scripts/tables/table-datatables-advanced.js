@@ -166,52 +166,22 @@ $(function () {
   // Advanced Filter table
   if (dt_adv_filter_table.length) {
     var dt_adv_filter = dt_adv_filter_table.DataTable({
-      ajax: '/sales/data',
-columns: [
-  { data: 'transdate', title: 'Tanggal' },
-  { data: 'nofaktur', title: 'No Faktur' },
-  { data: 'totalsales', title: 'Jumlah Faktur' },
-  { data: 'total', title: 'Jumlah Pembayaran' },
-  { data: 'status', title: 'Paid?' },
-  { data: 'overdue', title: 'Telat?' },
-
-  { data: null, title: 'Action' } 
-],
+      ajax: assetPath + 'data/table-datatable.json',
+      columns: [
+        { data: 'responsive_id' },
+        { data: 'full_name' },
+        { data: 'email' },
+        { data: 'post' },
+        { data: 'city' },
+        { data: 'start_date' },
+        { data: 'salary' }
+      ],
 
       columnDefs: [
         {
           className: 'control',
           orderable: false,
           targets: 0
-        },
-		{
-          // Actions
-          targets: -1,
-          title: 'Actions',
-          orderable: false,
-          render: function (data, type, full, meta) {
-            return (
-              '<div class="d-inline-flex">' +
-              '<a class="pe-1 dropdown-toggle hide-arrow text-primary" data-bs-toggle="dropdown">' +
-              feather.icons['more-vertical'].toSvg({ class: 'font-small-4' }) +
-              '</a>' +
-              '<div class="dropdown-menu dropdown-menu-end">' +
-              '<a href="javascript:;" class="dropdown-item">' +
-              feather.icons['file-text'].toSvg({ class: 'font-small-4 me-50' }) +
-              'Details</a>' +
-              '<a href="javascript:;" class="dropdown-item">' +
-              feather.icons['archive'].toSvg({ class: 'font-small-4 me-50' }) +
-              'Archive</a>' +
-              '<a href="javascript:;" class="dropdown-item delete-record">' +
-              feather.icons['trash-2'].toSvg({ class: 'font-small-4 me-50' }) +
-              'Delete</a>' +
-              '</div>' +
-              '</div>' +
-              '<a href="javascript:;" class="item-edit">' +
-              feather.icons['edit'].toSvg({ class: 'font-small-4' }) +
-              '</a>'
-            );
-          }
         }
       ],
       dom: '<"d-flex justify-content-between align-items-center mx-0 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>t<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
@@ -245,7 +215,79 @@ columns: [
     filterColumn($(this).attr('data-column'), $(this).val());
   });
 
+  // Responsive Table
+  // --------------------------------------------------------------------
 
+  if (dt_responsive_table.length) {
+    var dt_responsive = dt_responsive_table.DataTable({
+      ajax: assetPath + 'data/table-datatable.json',
+      columns: [
+        { data: 'responsive_id' },
+        { data: 'full_name' },
+        { data: 'email' },
+        { data: 'post' },
+        { data: 'city' },
+        { data: 'start_date' },
+        { data: 'salary' },
+        { data: 'age' },
+        { data: 'experience' },
+        { data: 'status' }
+      ],
+      columnDefs: [
+        {
+          className: 'control',
+          orderable: false,
+          targets: 0
+        },
+        {
+          // Label
+          targets: -1,
+          render: function (data, type, full, meta) {
+            var $status_number = full['status'];
+            var $status = {
+              1: { title: 'Current', class: 'badge-light-primary' },
+              2: { title: 'Professional', class: ' badge-light-success' },
+              3: { title: 'Rejected', class: ' badge-light-danger' },
+              4: { title: 'Resigned', class: ' badge-light-warning' },
+              5: { title: 'Applied', class: ' badge-light-info' }
+            };
+            if (typeof $status[$status_number] === 'undefined') {
+              return data;
+            }
+            return (
+              '<span class="badge rounded-pill ' +
+              $status[$status_number].class +
+              '">' +
+              $status[$status_number].title +
+              '</span>'
+            );
+          }
+        }
+      ],
+      dom: '<"d-flex justify-content-between align-items-center mx-0 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>t<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+      responsive: {
+        details: {
+          display: $.fn.dataTable.Responsive.display.modal({
+            header: function (row) {
+              var data = row.data();
+              return 'Details of ' + data['full_name'];
+            }
+          }),
+          type: 'column',
+          renderer: $.fn.dataTable.Responsive.renderer.tableAll({
+            tableClass: 'table'
+          })
+        }
+      },
+      language: {
+        paginate: {
+          // remove previous & next text from pagination
+          previous: '&nbsp;',
+          next: '&nbsp;'
+        }
+      }
+    });
+  }
 
   // Filter form control to default size for all tables
   $('.dataTables_filter .form-control').removeClass('form-control-sm');
