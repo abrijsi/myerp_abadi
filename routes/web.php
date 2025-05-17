@@ -225,4 +225,5 @@ Route::get('lang/{locale}', [LanguageController::class, 'swap']);
 
 
 Route::get('/sales', [SaleController::class, 'index'])->name('sales.index'); // Tampilkan view
+Route::get('/sales/input', [SaleController::class, 'input'])->name('sales.input'); // Tampilkan view
 Route::get('/sales/tabel', [SaleController::class, 'getDatatables'])->name('sales.tabel'); // DataTables AJAX server-side

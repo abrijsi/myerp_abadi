@@ -76,7 +76,10 @@ public function index()
 {
     return view('sales.index'); // tanpa ambil data
 }
-
+public function input()
+{
+    return view('sales.input'); // tanpa ambil data
+}
 
 }
 	

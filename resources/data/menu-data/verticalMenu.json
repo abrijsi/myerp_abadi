@@ -9,7 +9,7 @@
       "icon": "dollar-sign",
       "submenu": [
         {
-          "url": "sales/tabel",
+          "url": "sales",
           "name": "Tabel Penjualan",
           "icon": "circle",
           "slug": "sales-tabel"
@@ -27,7 +27,7 @@
           "slug": "sales-discount"
         },
         {
-          "url": "sales/faktur",
+          "url": "sales/input",
           "name": "Buat Faktur Penjualan",
           "icon": "circle",
           "slug": "sales-faktur"

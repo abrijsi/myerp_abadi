@@ -106,7 +106,7 @@
               </li>
               <li class="scrollable-container media-list">
                 <div class="list-item align-items-center">
-                  <img class="d-block rounded me-1" src="{{asset('images/pages/eCommerce/1.png')}}" alt="donuts" width="62">
+                  <!--<img class="d-block rounded me-1" src="{{asset('images/pages/eCommerce/1.png')}}" alt="donuts" width="62">-->
                   <div class="list-item-body flex-grow-1">
                     <i class="ficon cart-item-remove" data-feather="x"></i>
                     <div class="media-heading">
@@ -121,7 +121,7 @@
                   </div>
                 </div>
                 <div class="list-item align-items-center">
-                  <img class="d-block rounded me-1" src="{{asset('images/pages/eCommerce/7.png')}}" alt="donuts" width="62">
+                  <!--<img class="d-block rounded me-1" src="{{asset('images/pages/eCommerce/7.png')}}" alt="donuts" width="62">-->
                   <div class="list-item-body flex-grow-1">
                     <i class="ficon cart-item-remove" data-feather="x"></i>
                     <div class="media-heading">
@@ -136,7 +136,7 @@
                   </div>
                 </div>
                 <div class="list-item align-items-center">
-                  <img class="d-block rounded me-1" src="{{asset('images/pages/eCommerce/2.png')}}" alt="donuts" width="62">
+                  <!--<img class="d-block rounded me-1" src="{{asset('images/pages/eCommerce/2.png')}}" alt="donuts" width="62">-->
                   <div class="list-item-body flex-grow-1">
                     <i class="ficon cart-item-remove" data-feather="x"></i>
                     <div class="media-heading">
